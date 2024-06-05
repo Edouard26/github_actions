@@ -10,13 +10,25 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v2
 
+      - name: Log repository owner
+        run: echo "Repository Owner: ${{ github.repository_owner }}"
+
       - name: Set environment variables
-        run: echo "LOWERCASE_OWNER=${{ github.repository_owner }}" | tr '[:upper:]' '[:lower:]' | tee -a $GITHUB_ENV
+        run: |
+          echo "LOWERCASE_OWNER=${{ github.repository_owner }}" | tr '[:upper:]' '[:lower:]' | tee -a $GITHUB_ENV
+          echo "Lowercase Owner: $LOWERCASE_OWNER"
+        shell: bash
 
       - name: Log in to GitHub Container Registry
         env:
           CR_PAT: ${{ secrets.CR_PAT }}
-        run: echo "$CR_PAT" | docker login ghcr.io -u ${{ github.actor }} --password-stdin
+        run: |
+          echo "Logging in to GitHub Container Registry"
+          echo "$CR_PAT" | docker login ghcr.io -u ${{ github.actor }} --password-stdin
+        shell: bash
 
       - name: Build Docker image
-        run: docker build -t ghcr.io/${{ env.LOWERCASE_OWNER }}/dockerfile:latest .
+        run: |
+          echo "Building Docker image"
+          docker build -t ghcr.io/${{ env.LOWERCASE_OWNER }}/dockerfile:latest .
+        shell: bash
